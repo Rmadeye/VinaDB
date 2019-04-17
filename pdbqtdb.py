@@ -12,7 +12,6 @@ def df2sqlite(dataframe,tbl_name,db_name="Vina_database.db"):
     cur.execute("create table IF NOT EXISTS %s (%s)" % (tbl_name, col_str))
     cur.executemany("insert into %s values(%s)" % (tbl_name, wildcards), data)
 
-    cur.execute("DELETE FROM tbl_name WHERE rowid NOT IN (SELECT min(rowid) FROM tbl_name GROUP BY Filename,RMSDBestMode)")
 
     conn.commit()
     conn.close()
