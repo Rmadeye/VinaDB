@@ -1,49 +1,54 @@
 from tkinter import *
 from tkinter import filedialog
 import subprocess
-from src import dock_parser as p, pdbqtdb as db
+from src import dock_parser
+from src import pdbqtdb
+
+class Application(Frame):
+
+    def exit_window(self):
+        self.quit()
+
+    def browse_pdbqt(self):
+        global logfile
+        logfile = filedialog.askopenfilename(filetypes=[("Docking reports", "*.pdbqt")])
+        print(logfile)
+        logprint = Label(self, text=logfile).grid(row=0, column=0)
+        self.update()
+        return logfile
+
+    def set_sqltablename(self):
+        tablename = self.tbl.get()
+        tablename = str(tablename)
+        print(tablename)
+        return tablename
+
+    def run(self):
+        dbmng = pdbqtdb.database()
+        parse = dock_parser.parser()
+        # logfile = self.browse_pdbqt()
+        dbmng.df2sqlite(parse.parse(logfile), str(self.set_sqltablename()), 'Vina_database.db')
+        fileadded = Label(self, text="Database successfully updated").grid(row=1, column=0)
+
+    def open_sqlitebrowser(self):
+        dbbrowser = subprocess.run(["sqlitebrowser"])
+
+    def create_widgets(self):
+
+        button1 = Button(self, text="Browse logfile", command=self.browse_pdbqt).grid(row=0, column=2)
+        button3 = Button(self, text="Add to Vina database", command=self.run).grid(row=2, column=2)
+        button4 = Button(self, text="Open database browser", command=self.open_sqlitebrowser).grid(row=3, column=2)
+        button5 = Button(self, text="Exit", command=self.exit_window).grid(row=4, column=2)
+        self.tbl = Entry(self)
+        self.tbl.grid(row=1, column=2)
+        self.ltbl = Label(self, text="Database table name:").grid(row=1, column=1)
+        self.btbl = Button(self, text="OK", command=self.set_sqltablename).grid(row=1, column=3)
 
 
-class frontend:
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.pack()
+        self.create_widgets()
+        self.winfo_toplevel().title("Vina-DB")
+        self.mainloop()
 
-    def __init__(self):
-        window = Tk()
-        window.wm_title("Add to Vina database")
-
-        dbmng = db.database()
-
-
-        def exit_window():
-            window.destroy()
-
-        def browse_pdbqt():
-            global logfile
-            logfile = filedialog.askopenfilename(filetypes=[("Docking reports", "*.pdbqt")])
-            print(logfile)
-            logprint = Label(window, text=logfile).grid(row=0, column=0)
-            window.update()
-            return logfile
-
-        def set_sqltablename():
-            tablename = tbl.get()
-            tablename = str(tablename)
-            print(tablename)
-            return tablename
-
-        def run():
-            dbmng.df2sqlite(p.parser().parse(logfile), str(set_sqltablename()), 'Vina_database.db')
-            fileadded = Label(window, text="Database successfully updated").grid(row=1, column=0)
-
-        def open_sqlitebrowser():
-            dbbrowser = subprocess.run(["sqlitebrowser"])
-
-        button1 = Button(window, text="Browse logfile", command=browse_pdbqt).grid(row=0, column=2)
-        button3 = Button(window, text="Add to Vina database", command=run).grid(row=2, column=2)
-        button4 = Button(window, text="Open database browser", command=open_sqlitebrowser).grid(row=3, column=2)
-        button5 = Button(window, text="Exit", command=exit_window).grid(row=4, column=2)
-        tbl = Entry(window)
-        tbl.grid(row=1, column=2)
-        ltbl = Label(window, text="Database table name:").grid(row=1, column=1)
-        btbl = Button(window, text="OK", command=set_sqltablename).grid(row=1, column=3)
-
-        window.mainloop()
