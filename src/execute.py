@@ -10,12 +10,11 @@ class Application(Frame):
         self.quit()
 
     def browse_pdbqt(self):
-        global logfile
-        logfile = filedialog.askopenfilename(filetypes=[("Docking reports", "*.pdbqt")])
-        print(logfile)
-        logprint = Label(self, text=logfile).grid(row=0, column=0)
+        self.logfile = filedialog.askopenfilename(filetypes=[("Docking reports", "*.pdbqt")])
+        print(self.logfile)
+        logprint = Label(self, text=self.logfile).grid(row=0, column=0)
         self.update()
-        return logfile
+        return self.logfile
 
     def set_sqltablename(self):
         tablename = self.tbl.get()
@@ -26,8 +25,10 @@ class Application(Frame):
     def run(self):
         dbmng = pdbqtdb.database()
         parse = dock_parser.parser()
-        # logfile = self.browse_pdbqt()
-        dbmng.df2sqlite(parse.parse(logfile), str(self.set_sqltablename()), 'Vina_database.db')
+
+        logprint = Label(self, text=self.logfile).grid(row=0, column=0)
+        self.update()
+        dbmng.df2sqlite(parse.parse(self.logfile), str(self.set_sqltablename()), 'Vina_database.db')
         fileadded = Label(self, text="Database successfully updated").grid(row=1, column=0)
 
     def open_sqlitebrowser(self):
