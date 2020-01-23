@@ -9,13 +9,13 @@ class Application(Frame):
     def exit_window(self):
         self.quit()
 
-    def browse_pdbqt(self):
-        self.logfiles = list(filedialog.askopenfilenames(filetypes=[("Docking reports", "*.pdbqt")]))
-
-        logprint = Label(self, text="The logs from {} files were chosen".format(len(self.logfiles))
-                         ).grid(row=0, column=0)
-        self.update()
-        return self.logfiles
+    #def browse_pdbqt(self):
+        #self.logfiles = list(filedialog.askopenfilenames(filetypes=[("Docking reports", "*.pdbqt")]))
+        #
+        # logprint = Label(self, text="The logs from {} files were chosen".format(len(self.logfiles))
+        #                  ).grid(row=0, column=0)
+        # self.update()
+        # return self.logfiles
 
     def set_sqltablename(self):
         tablename = self.tbl.get()
@@ -24,13 +24,15 @@ class Application(Frame):
         return tablename
 
     def run(self):
+        self.logfiles = ['test/fileA.pdbqt','test/FileB.pdbqt']
         dbmng = pdbqtdb.database()
         parse = dock_parser.parser()
         self.update()
 
         for file in self.logfiles:
+            parse.parse(file)
 
-            dbmng.df2sqlite(parse.parse(file), str(self.set_sqltablename()), 'Vina_database.db')
+            #dbmng.df2sqlite(parse.parse(file), str(self.set_sqltablename()), 'Vina_database.db')
 
         fileadded = Label(self, text="Database successfully updated").grid(row=1, column=0)
 
@@ -39,7 +41,7 @@ class Application(Frame):
 
     def create_widgets(self):
 
-        button1 = Button(self, text="Browse logfile", command=self.browse_pdbqt).grid(row=0, column=2)
+        #button1 = Button(self, text="Browse logfile", command=self.browse_pdbqt).grid(row=0, column=2)
         button3 = Button(self, text="Add to Vina database",
                          command=lambda: [f() for f in [self.set_sqltablename, self.run]]
                          ).grid(row=2, column=2)
