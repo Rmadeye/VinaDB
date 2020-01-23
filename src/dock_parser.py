@@ -7,7 +7,12 @@ class parser:
     def __init__(self):
         pass
 
-    def parse(self, logfile, names=[], energy_values = [], rmsddist=[], rmsd=[], status=[]):
+    def parse(self, logfile):
+        names = []
+        energy_values = []
+        rmsddist = []
+        rmsd = []
+        status = []
         patternM=re.compile(r"MODEL")
         patternV=re.compile(r"REMARK VINA RESULT")
         PatternVDS=re.compile(r"viewdock state:")
